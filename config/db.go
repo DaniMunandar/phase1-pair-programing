@@ -1,19 +1,3 @@
-// package config
-
-// import (
-// 	"database/sql"
-
-// 	_ "github.com/go-sql-driver/mysql"
-// )
-
-// func GetDB() (*sql.DB, error) {
-// 	connStr := "root:@tcp(localhost:3306)/buku"
-// 	db, err := sql.Open("mysql", connStr)
-// 	return db, err
-// }
-
-// config/config.go
-
 package config
 
 import (
