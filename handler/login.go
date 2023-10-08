@@ -8,18 +8,19 @@ import (
 
 func Login(username, password string) (bool, error) {
 	var hashedPassword string
+	var isAdmin bool
 
 	// Cari pelanggan berdasarkan nama pengguna
-	err := config.DB.QueryRow("SELECT password FROM customers WHERE username = ?", username).Scan(&hashedPassword)
+	err := config.DB.QueryRow("SELECT password, isAdmin FROM customers WHERE username = ?", username).Scan(&hashedPassword, &isAdmin)
 	if err != nil {
-		return false, err
+		return isAdmin, err
 	}
 
 	// Verifikasi kata sandi
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 	if err != nil {
-		return false, nil // Kata sandi tidak cocok
+		return isAdmin, err // Kata sandi tidak cocok
 	}
 
-	return true, nil // Otentikasi berhasil
+	return isAdmin, nil // Otentikasi berhasil
 }

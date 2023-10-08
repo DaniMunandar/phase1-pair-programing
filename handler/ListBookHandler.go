@@ -8,12 +8,12 @@ import (
 )
 
 func GetBook() ([]entity.Book, error) {
-	var books []entity.Book
+	books := []entity.Book{}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	rows, err := config.DB.QueryContext(ctx, "SELECT books.title AS 'Title', author.name AS 'Author', books.publication_date AS 'Publication' FROM books JOIN author ON books.author_id = books.id")
+	rows, err := config.DB.QueryContext(ctx, "SELECT books.title AS 'Title', author.name AS 'Author', books.publication_date AS 'Publication' FROM books JOIN author ON books.author_id = author.id")
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func GetBookByID(bookID int) (entity.Book, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	err := config.DB.QueryRowContext(ctx, "SELECT title, author_id, publication_date FROM books WHERE id = ?", bookID).Scan(&book.Title, &book.Author, &book.PublicationDate)
+	err := config.DB.QueryRowContext(ctx, "SELECT title, author_id, publication_date, id FROM books WHERE id = ?", bookID).Scan(&book.Title, &book.Author, &book.PublicationDate, &book.ID)
 	if err != nil {
 		return book, err
 	}
@@ -72,11 +72,10 @@ func GetBookByID(bookID int) (entity.Book, error) {
 	return book, nil
 }
 
-func UpdateBook(book entity.Book) error {
+func UpdateBook(book *entity.Book) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Gunakan query SQL UPDATE untuk memperbarui buku dalam database.
 	_, err := config.DB.ExecContext(ctx, "UPDATE books SET title=?, author_id=?, publication_date=? WHERE id=?", book.Title, book.AuthorID, book.PublicationDate, book.ID)
 
 	if err != nil {
